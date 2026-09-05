@@ -6,7 +6,7 @@ def show_banner():
     print("      food waste management system")
     print('=' * 40)
 
-def show_menu(user):
+def show_main_menu(user):
     print('\n' + '-'*40)
     print('              main menu')
     print('-' * 40)
@@ -25,6 +25,43 @@ def show_menu(user):
 
     print('-' * 40)
 
+def has_permission(user, allowed_roles):
+    return user['role'] in allowed_roles
+
+def run_app(user):
+     while True:
+        show_main_menu(user)
+
+        choice = input("\nEnter your choice: ")
+
+        if choice == "1":
+            if has_permission(user, ["admin", "manager"]):
+                from students import student_menu
+                student_menu()
+            else:
+                print("\nUnauthorized access.")
+
+        elif choice == "2":
+            if has_permission(user, ["admin", "manager"]):
+                from meals import meal_menu
+                meal_menu()
+            else:
+                print("\nUnauthorized access.")
+
+        elif choice == "3":
+            if has_permission(user, ["admin", "student"]):
+                from attendance import attendance_menu
+                attendance_menu(user)
+            else:
+                print("\nUnauthorized access.")
+
+        elif choice == "0":
+            print("\nthank you for using messwise. Goodbye!")
+            break
+
+        else:
+            print("\nInvalid choice. Please try again.")
+
 def main():
     show_banner()
 
@@ -34,20 +71,7 @@ def main():
         print("\nLogin failed. Exiting messwise.")
         return
 
-    while True:
-        show_menu(user)
-
-        choice = input('\nEnter your choice: ')
-
-        if choice == '1':
-            print('\nFeature 1 selected')
-        elif choice == '2':
-            print('\nFeature 2 selected')
-        elif choice == '0':
-            print('\nthank you for using messwise.')
-            break
-        else:
-            print('\nInvalid choice. Please try again!')
+    run_app(user)
 
 if __name__ == '__main__':
     main()
