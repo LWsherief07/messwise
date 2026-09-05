@@ -1,43 +1,53 @@
-from database import get_connection
+from auth import login
 
 def show_banner():
     print('=' * 40)
-    print('messwise')
-    print('food waste management system')
+    print("              messwise")
+    print("      food waste management system")
     print('=' * 40)
 
-def show_menu():
-    print('\nmain menu')
+def show_menu(user):
+    print('\n' + '-'*40)
+    print('              main menu')
     print('-' * 40)
-    print('1. feature 1')
-    print('2. feature 2')
-    print('0. exit')
-    
+    print(f'logged in as: {user["username"]} ({user["role"]})')
+    print('-' * 40)
+
+    print("1. Student Management")
+    print("2. Meal Management")
+    print("3. Attendance")
+    print("4. Food & Waste Tracking")
+    print("5. Reports & Statistics")
+    print("6. Preparation Recommendation")
+    print("7. My Account")
+    print("8. Logout")
+    print("0. Exit")
+
+    print('-' * 40)
+
 def main():
     show_banner()
-    connection = get_connection()
 
-    if connection:
-        print('Database connection successful. Check main menu now.')
-    else:
-        print('Failed to connect to MySQL database')
+    user = login()
+
+    if user is None:
+        print("\nLogin failed. Exiting messwise.")
         return
 
     while True:
-        show_menu()
-        choice = input('Enter your choice: ')
+        show_menu(user)
+
+        choice = input('\nEnter your choice: ')
 
         if choice == '1':
-            print('Feature 1 selected')
+            print('\nFeature 1 selected')
         elif choice == '2':
-            print('Feature 2 selected')
+            print('\nFeature 2 selected')
         elif choice == '0':
-            print('thank you for using messwise.')
+            print('\nthank you for using messwise.')
             break
         else:
-            print('Invalid choice. Please try again!')
-
-    connection.close()
+            print('\nInvalid choice. Please try again!')
 
 if __name__ == '__main__':
     main()
