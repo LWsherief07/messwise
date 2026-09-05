@@ -55,6 +55,13 @@ def run_app(user):
             else:
                 print("\nUnauthorized access.")
 
+        elif choice == "4":
+            if has_permission(user, ["admin", "manager"]):
+                from food_waste import food_waste_menu
+                food_waste_menu()
+            else:
+                print("\nUnauthorized access.")
+
         elif choice == "0":
             print("\nthank you for using messwise. Goodbye!")
             break
