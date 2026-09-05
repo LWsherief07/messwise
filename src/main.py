@@ -62,6 +62,13 @@ def run_app(user):
             else:
                 print("\nUnauthorized access.")
 
+        elif choice == "5":
+            if has_permission(user, ["admin", "manager"]):
+                from reports import reports_menu
+                reports_menu()
+            else:
+                print("\nUnauthorized access.")
+
         elif choice == "0":
             print("\nthank you for using messwise. Goodbye!")
             break
