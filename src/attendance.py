@@ -1,104 +1,61 @@
 from database import get_connection
 
 def record_attendance(user):
-    student_id = user["user_id"]
-    meal_id = input("Enter meal ID: ")
-
+    user_id = user["user_id"]
+    
     connection = get_connection()
     if connection is None:
         return
 
     cursor = connection.cursor()
 
-    try:
-        # appropriate meal
-        cursor.execute(
-            "SELECT meal_id FROM meals WHERE meal_id = %s",
-            (meal_id,)
-        )
+    query = "SELECT meal_id, meal_date, meal_type, menu FROM meals NATURAL JOIN attendance WHERE user_id = %s AND ate = FALSE ORDER BY meal_date DESC"
+    cursor.execute(query, (user_id,))
+    meal = cursor.fetchone()
 
-        if cursor.fetchone() is None:
-            print("\nMeal not found.")
-            return
-
-        # no duplicates
-        cursor.execute(
-            """
-            SELECT attendance_id
-            FROM attendance
-            WHERE student_id = %s AND meal_id = %s
-            """,
-            (student_id, meal_id)
-        )
-
-        if cursor.fetchone():
-            print("\nAttendance already recorded.")
-            return
-
-
-        cursor.execute(
-            """
-            INSERT INTO attendance (student_id, meal_id, ate)
-            VALUES (%s, %s, TRUE)
-            """,
-            (student_id, meal_id)
-        )
-
-        connection.commit()
-        print("\nAttendance recorded successfully!")
-
-    except Exception as error:
-        connection.rollback()
-        print(f"\nFailed to record attendance: {error}")
-
-    finally:
+    if meal is None:
+        print("\nNo available meal for attendance.")
         cursor.close()
         connection.close()
-
-
-def view_attendance():
-    connection = get_connection()
-    if connection is None:
         return
 
-    cursor = connection.cursor()
+    else:
+        print(f'Available meal for attendance: {meal}')
+        decision = input("Do you want to mark attendance for this meal? (yes/no): ").strip().lower()
 
-    try:
-        cursor.execute(
-            """
-            SELECT
-                a.attendance_id,
-                s.name,
-                m.meal_date,
-                m.meal_type
-            FROM attendance a
-            JOIN students s ON a.student_id = s.student_id
-            JOIN meals m ON a.meal_id = m.meal_id
-            ORDER BY m.meal_date DESC, a.attendance_id DESC
-            """
-        )
-
-        records = cursor.fetchall()
-
-        print("\n" + "=" * 65)
-        print("                     ATTENDANCE")
-        print("=" * 65)
-
-        if not records:
-            print("No attendance records found.")
+        if decision != 'yes':
+            print("\nAttendance not recorded.")
+            cursor.close()
+            connection.close()
+            return
+        
         else:
-            for record in records:
-                print(
-                    f"ID: {record[0]} | "
-                    f"Student: {record[1]} | "
-                    f"Date: {record[2]} | "
-                    f"Meal: {record[3].title()}"
-                )
+            query = "UPDATE attendance SET ate = TRUE WHERE user_id = %s AND meal_id = %s"
+            cursor.execute(query, (user_id, meal[0]))
+            connection.commit()
+            print("\nAttendance recorded successfully!")
+    
+    cursor.close()
+    connection.close()
 
-    finally:
-        cursor.close()
-        connection.close()
 
+def view_attendance(user):
+    user_id = user["user_id"]
+    connection = get_connection()
+    if connection is None:
+        return
+
+    cursor = connection.cursor()
+
+    query = "SELECT meal_date, meal_type, menu, ate FROM meals NATURAL JOIN attendance WHERE user_id = %s ORDER BY meal_date DESC"
+    cursor.execute(query, (user_id,))
+    records = cursor.fetchall()
+
+    for record in records:
+        print(f"Date: {record[0]}, Type: {record[1]}, Menu: {record[2]}, Ate: {record[3]}")
+
+    cursor.close()
+    connection.close()
 
 def attendance_menu(user):
     while True:
@@ -115,7 +72,7 @@ def attendance_menu(user):
         if choice == "1":
             record_attendance(user)
         elif choice == "2":
-            view_attendance()
+            view_attendance(user)
         elif choice == "0":
             break
         else:

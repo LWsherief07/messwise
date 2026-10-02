@@ -2,63 +2,28 @@ from database import get_connection
 
 
 def record_food():
-    meal_id = input("Enter meal ID: ")
-    prepared = float(input("Enter food prepared: "))
-    consumed = float(input("Enter food consumed: "))
-    wasted = float(input("Enter food wasted: "))
-
-    if prepared < 0 or consumed < 0 or wasted < 0:
-        print("\nFood values cannot be negative.")
-        return
-
-    if consumed + wasted > prepared:
-        print("\nConsumed plus wasted cannot exceed prepared food.")
-        return
 
     connection = get_connection()
     if connection is None:
         return
-
     cursor = connection.cursor()
 
-    try:
-        cursor.execute(
-            "SELECT meal_id FROM meals WHERE meal_id = %s",
-            (meal_id,)
-        )
+    query = "SELECT meal_id, meal_date, meal_type, menu FROM meals"
+    cursor.execute(query)
+    meals = cursor.fetchall()
+    for meal in meals:
+        print(f"Meal ID: {meal[0]}, Date: {meal[1]}, Type: {meal[2]}, Menu: {meal[3]}")
 
-        if cursor.fetchone() is None:
-            print("\nMeal not found.")
-            return
+    meal_id = input("Enter meal ID: ")
+    amnt = int(input("Enter food prepared: "))
 
-        cursor.execute(
-            "SELECT record_id FROM food_records WHERE meal_id = %s",
-            (meal_id,)
-        )
+    query = "INSERT INTO food_records(meal_id, food_prepared) VALUES (%s, %s)"
+    cursor.execute(query, (meal_id, amnt))
+    print("\nFood prepared amount recorded successfully!")
+    connection.commit()
 
-        if cursor.fetchone():
-            print("\nFood record already exists for this meal.")
-            return
-
-        cursor.execute(
-            """
-            INSERT INTO food_records
-                (meal_id, food_prepared, food_consumed, food_wasted)
-            VALUES (%s, %s, %s, %s)
-            """,
-            (meal_id, prepared, consumed, wasted)
-        )
-
-        connection.commit()
-        print("\nFood record saved successfully.")
-
-    except Exception as error:
-        connection.rollback()
-        print(f"\nFailed to save food record: {error}")
-
-    finally:
-        cursor.close()
-        connection.close()
+    cursor.close()
+    connection.close()
 
 
 def view_food_records():
@@ -68,64 +33,26 @@ def view_food_records():
 
     cursor = connection.cursor()
 
-    try:
-        cursor.execute(
-            """
-            SELECT
-                f.record_id,
-                f.meal_id,
-                m.meal_date,
-                m.meal_type,
-                m.menu,
-                f.food_prepared,
-                f.food_consumed,
-                f.food_wasted,
-                CASE
-                    WHEN f.food_prepared = 0 THEN 0
-                    ELSE (f.food_wasted / f.food_prepared) * 100
-                END AS waste_percentage
-            FROM food_records f
-            JOIN meals m ON f.meal_id = m.meal_id
-            ORDER BY m.meal_date DESC, f.record_id DESC
-            """
-        )
+    query = "SELECT meal_id, menu, food_prepared from meals NATURAL JOIN food_records"
+    cursor.execute(query)
+    records = cursor.fetchall()
 
-        records = cursor.fetchall()
+    for record in records:
+        query = "SELECT COUNT(user_id) FROM attendance WHERE meal_id = %s AND ate = TRUE"
+        cursor.execute(query, (record[0],))
+        count = cursor.fetchone()[0]
+        print(f"Meal ID: {record[0]}, Menu: {record[1]}, Food Prepared: {record[2]}, Food Consumed: {count}, Food Wasted: {record[2] - count}")
 
-        print("\n" + "=" * 100)
-        print("                         FOOD AND WASTE RECORDS")
-        print("=" * 100)
-
-        if not records:
-            print("No food records found.")
-        else:
-            for record in records:
-                print(
-                    f"Record ID: {record[0]} | "
-                    f"Meal ID: {record[1]} | "
-                    f"Date: {record[2]} | "
-                    f"Type: {record[3].title()} | "
-                    f"Menu: {record[4]}"
-                )
-                print(
-                    f"Prepared: {record[5]} | "
-                    f"Consumed: {record[6]} | "
-                    f"Wasted: {record[7]} | "
-                    f"Waste: {record[8]:.2f}%"
-                )
-
-    finally:
-        cursor.close()
-        connection.close()
-
+    cursor.close()
+    connection.close()
 
 def food_waste_menu():
     while True:
         print("\n" + "=" * 40)
         print("          FOOD AND WASTE TRACKING")
         print("=" * 40)
-        print("1. Record Food")
-        print("2. View Food Records")
+        print("1. Record Food Prepared")
+        print("2. View Food Consumption and Waste")
         print("0. Back")
         print("=" * 40)
 

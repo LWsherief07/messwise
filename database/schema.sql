@@ -2,24 +2,18 @@ CREATE DATABASE IF NOT EXISTS messwise;
 
 USE messwise;
 
--- Users and roles
+-- Users
 CREATE TABLE users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'manager', 'student') NOT NULL
+    role ENUM('admin', 'student') NOT NULL
 );
 
--- Students
-CREATE TABLE students (
-    student_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    room_no VARCHAR(20),
-);
 
 -- Meals
 CREATE TABLE meals (
-    meal_id INT AUTO_INCREMENT PRIMARY KEY,
+    meal_id INT PRIMARY KEY,
     meal_date DATE NOT NULL,
     meal_type ENUM('breakfast', 'lunch', 'dinner') NOT NULL,
     menu VARCHAR(255) NOT NULL
@@ -27,28 +21,39 @@ CREATE TABLE meals (
 
 -- Attendance
 CREATE TABLE attendance (
-    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id INT NOT NULL,
+    user_id INT NOT NULL,
     meal_id INT NOT NULL,
-    ate BOOLEAN NOT NULL,
+    ate BOOLEAN DEFAULT FALSE,
 
-    FOREIGN KEY (student_id) REFERENCES students(student_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
         ON DELETE CASCADE,
 
     FOREIGN KEY (meal_id) REFERENCES meals(meal_id)
         ON DELETE CASCADE,
 
-    UNIQUE (student_id, meal_id)
+    UNIQUE (user_id, meal_id)
 );
+
+-- Trigger (to automatically create new attendance record for every student (Default ate = False) when a new meal is added)
+
+/*DELIMITER //
+
+CREATE TRIGGER after_meal_insert
+AFTER INSERT ON meals
+FOR EACH ROW
+BEGIN
+    INSERT INTO attendance (user_id, meal_id, ate)
+    SELECT user_id, NEW.meal_id, FALSE
+    FROM users
+    WHERE role = 'student';
+END //
+
+DELIMITER ;*/
 
 -- Food and waste records
 CREATE TABLE food_records (
-    record_id INT AUTO_INCREMENT PRIMARY KEY,
     meal_id INT NOT NULL,
-    food_prepared DECIMAL(10,2) NOT NULL,
-    food_consumed DECIMAL(10,2) NOT NULL,
-    food_wasted DECIMAL(10,2) NOT NULL,
-
+    food_prepared INT NOT NULL,
     FOREIGN KEY (meal_id) REFERENCES meals(meal_id)
         ON DELETE CASCADE
 );
