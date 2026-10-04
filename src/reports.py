@@ -10,17 +10,22 @@ def generate_report():
     
     cursor = connection.cursor()
     
-    query = "SELECT meal_id, menu, food_prepared from meals NATURAL JOIN food_records"
+    query = "SELECT meal_id, menu, amnt from meals"
     cursor.execute(query)
     records = cursor.fetchall()
     
     for record in records:
+        # calculate avg consumption and lowest waste meal
         query = "SELECT COUNT(user_id) FROM attendance WHERE meal_id = %s AND ate = TRUE"
         cursor.execute(query, (record[0],))
         count = cursor.fetchone()[0]
         food_consumption_values.append(count)
         food_wasted = record[2] - count
         lowest_waste_dictionary[record[1]] = food_wasted
+
+        # print meal details
+        print(f'Meal ID: {record[0]}, Menu: {record[1]}, Portions Prepared: {record[2]}, Portions Consumed: {count}, Portions Wasted: {food_wasted}')
+
 
     print(f'Recommended preparation amount for next meal: {sum(food_consumption_values) // len(food_consumption_values)}')
     print(f'Lowest waste meal: {min(lowest_waste_dictionary, key=lowest_waste_dictionary.get)}')

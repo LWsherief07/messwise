@@ -16,9 +16,8 @@ def show_main_menu(user):
     print("1. Student Management")
     print("2. Meal Management")
     print("3. Attendance Marking")
-    print("4. Insert Portions Prepared")
-    print("5. Reports & Statistics")
-    print("6. Logout")
+    print("4. Reports & Statistics")
+    print("5. Logout")
     print("0. Exit")
 
     print('-' * 40)
@@ -55,19 +54,12 @@ def run_app(user):
 
         elif choice == "4":
             if has_permission(user, "admin"):
-                from food_waste import food_waste_menu
-                food_waste_menu()
-            else:
-                print("\nUnauthorized access.")
-
-        elif choice == "5":
-            if has_permission(user, "admin"):
                 from reports import reports_menu
                 reports_menu()
             else:
                 print("\nUnauthorized access.")
 
-        elif choice == "6":
+        elif choice == "5":
             print("\nLogged Out successfully.")
             user = login()
             

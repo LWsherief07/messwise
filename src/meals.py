@@ -5,6 +5,7 @@ def add_meal():
     meal_date = input("Enter meal date (YYYY-MM-DD): ")
     meal_type = input("Enter meal type (breakfast/lunch/dinner): ").lower()
     menu = input("Enter menu: ")
+    amnt = input("Enter the no. of portions prepared: ")
 
     if meal_type not in ["breakfast", "lunch", "dinner"]:
         print("\nInvalid meal type.")
@@ -17,9 +18,9 @@ def add_meal():
 
     cursor = connection.cursor()
 
-    query = "INSERT INTO meals (meal_id, meal_date, meal_type, menu) VALUES (%s, %s, %s, %s)"
+    query = "INSERT INTO meals (meal_id, meal_date, meal_type, menu, amnt) VALUES (%s, %s, %s, %s, %s)"
     
-    cursor.execute(query, (meal_id, meal_date, meal_type, menu))
+    cursor.execute(query, (meal_id, meal_date, meal_type, menu, amnt))
     connection.commit()
 
     print("\nMeal added successfully!")
@@ -37,7 +38,7 @@ def view_meals():
     cursor = connection.cursor()
 
     query = """
-        SELECT meal_id, meal_date, meal_type, menu
+        SELECT meal_id, meal_date, meal_type, menu, amnt
         FROM meals
         ORDER BY meal_date DESC
         """
@@ -53,7 +54,7 @@ def view_meals():
         print("No meals found.")
     else:
         for meal in meals:
-            print(f"ID: {meal[0]}, Date: {meal[1]}, Type: {meal[2]}, Menu: {meal[3]}")
+            print(f"ID: {meal[0]}, Date: {meal[1]}, Type: {meal[2]}, Menu: {meal[3]}, Portions Prepared: {meal[4]}")
 
     cursor.close()
     connection.close()

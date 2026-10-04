@@ -16,7 +16,8 @@ CREATE TABLE meals (
     meal_id INT PRIMARY KEY,
     meal_date DATE NOT NULL,
     meal_type ENUM('breakfast', 'lunch', 'dinner') NOT NULL,
-    menu VARCHAR(255) NOT NULL
+    menu VARCHAR(255) NOT NULL,
+    amnt INT NOT NULL
 );
 
 -- Attendance
@@ -49,11 +50,3 @@ BEGIN
 END //
 
 DELIMITER ;*/
-
--- Food and waste records
-CREATE TABLE food_records (
-    meal_id INT NOT NULL,
-    food_prepared INT NOT NULL,
-    FOREIGN KEY (meal_id) REFERENCES meals(meal_id)
-        ON DELETE CASCADE
-);

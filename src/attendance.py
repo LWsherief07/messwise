@@ -20,7 +20,7 @@ def record_attendance(user):
         return
 
     else:
-        print(f'Available meal for attendance: {meal}')
+        print(f'Available meal for attendance --> Date: {meal[1]}, Type: {meal[2]}, Menu: {meal[3]}')
         decision = input("Do you want to mark attendance for this meal? (yes/no): ").strip().lower()
 
         if decision != 'yes':
