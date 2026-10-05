@@ -2,65 +2,53 @@
 
 ## 1. Introduction
 
-Messwise is a food waste management system designed for a hostel or mess environment. The project is implemented as a Python command-line application with a MySQL database backend. It supports two user roles: admin and student. The system allows administrators to manage students and meals, while students can mark their attendance for meals and review their food consumption history.
+Messwise is a food waste management system designed to address the recurring problem of excessive food wastage in messes, hostels, cafeterias, and institutional dining facilities around the world. In many places, food is prepared without accurate insight into actual attendance, consumption patterns, or meal demand, which leads to surplus food, financial loss, and unnecessary waste.
 
-The core purpose of the application is to help the mess administration track meal preparation, monitor student attendance, and generate useful statistics to reduce food wastage and improve planning decisions.
+This project presents a practical digital solution to reduce waste by tracking meal records, student attendance, and consumption trends in a structured and efficient manner. It is implemented as a Python command-line application with a MySQL database backend and is designed to support role-based operations for administrators and students.
 
 ## 2. Objectives
 
 The main objectives of the project are:
 
-- Manage student records in a mess or hostel environment.
-- Add and track meals by date and type (breakfast, lunch, dinner).
-- Record student meal attendance and maintain historical participation data.
-- Generate basic reports to analyze food consumption and identify meal waste.
+- Reduce food wastage in mess operations by making meal preparation decisions more data-driven.
+- Manage student records in a hostel or mess environment.
+- Track meals by date and type, such as breakfast, lunch, and dinner.
+- Record meal attendance to reflect actual consumption patterns.
+- Generate basic reports to identify waste and estimate recommended preparation quantities.
 - Provide role-based access control so that only authorized users can access certain functions.
-- Support efficient decision-making for food preparation based on consumption patterns.
+- Support better planning and accountability in mess administration.
 
 ## 3. Existing System
 
-The current project already contains a working CLI-based system with the following features:
+The existing system in many messes and dining facilities around the world still relies heavily on manual or semi-manual processes. These traditional methods often lead to several common problems:
 
-- User authentication using username and password against the users table.
-- Role-based menu access for admin and student users.
-- Student management functions: add student and view student list.
-- Meal management functions: add meal and view meals.
-- Attendance management functions: record attendance and view personal attendance history.
-- Reporting module: generate report with consumption, waste, and recommended preparation guidance.
+- Meals are prepared based on estimated demand rather than actual attendance.
+- Student attendance is not consistently tracked, making it difficult to estimate consumption.
+- Excess food is often cooked and left unused due to poor planning and lack of records.
+- Mess administrators have limited access to precise data for forecasting and waste analysis.
+- There is no standardized way to compare prepared portions with actual consumption.
+- Food shortages or overproduction may occur because records are not updated in real time.
+- Manual tracking creates confusion, errors, and inconsistent meal planning.
 
-The application architecture is organized into modular Python files:
+These issues contribute to financial loss, poor resource utilization, and environmental harm. Food waste is not only a logistical problem but also a social and sustainability challenge across institutions and communities.
 
-- `src/main.py` — application entry point and navigation flow
-- `src/auth.py` — login logic
-- `src/database.py` — database connection logic
-- `src/students.py` — student registration and listing
-- `src/meals.py` — meal creation and viewing
-- `src/attendance.py` — attendance recording and display
-- `src/reports.py` — report generation and statistics
-
-The database schema is defined in `database/schema.sql` and includes:
-
-- `users` table for login and roles
-- `meals` table for meal records
-- `attendance` table for user-meal attendance mapping
-
-The current system uses a MySQL database with environment variables for configuration, including host, user, password, and database name.
+In this context, the project recognizes the need for a better management system that can help messes become more organized, transparent, and efficient.
 
 ## 4. Proposed System
 
-The proposed system is a structured, role-based mess management platform that automates the core operations of meal tracking and student attendance. The solution builds on the current CLI model and expands it into a more formal digital system for day-to-day mess operations.
+The proposed system is a digital mess management solution developed to directly address the above issues. Instead of relying on guesswork and manual record keeping, the system uses a simple but effective database-driven workflow to monitor meals, attendance, and food usage.
 
-The proposed system should include:
+Our project provides the following solutions:
 
-- Secure login and authorization for admins and students.
-- Centralized database storage for users, meals, and attendance.
+- Secure login and role-based access for admin and student users.
+- A centralized database for managing users, meals, and attendance records.
 - Meal planning based on date, meal type, menu, and portion quantities.
-- Attendance marking for each student against each meal served.
-- Attendance history review for individual students.
-- Administrative reporting for consumption trends and waste measurement.
-- Recommendation logic to estimate future preparation quantities by comparing meal demand and actual attendance.
+- Attendance recording to capture whether a student consumed a given meal.
+- Personal attendance history for students to review their participation.
+- Administrative reporting to calculate portions prepared, consumed, and wasted.
+- Recommendation logic that suggests suitable preparation quantities for future meals based on consumption trends.
 
-The system is intended to reduce manual record-keeping and provide a simple but effective decision support layer for mess operations. It is especially useful in environments where meal preparation decisions need to be based on real attendance and consumption records.
+This proposed solution helps mess administrators reduce waste by improving visibility into actual food consumption and making more informed preparation decisions. The system is designed as a practical and accessible tool that can be implemented in real mess environments to support sustainability, cost control, and operational efficiency.
 
 ## 5. SDLC (Tagged by File Name)
 
